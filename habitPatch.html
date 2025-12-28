@@ -1,0 +1,1760 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🍓Habit Patch</title>
+  <style>
+    :root{
+      /* Wes-ish pastel palette */
+      --bg:#fbf3e6;            /* warm cream */
+      --card:#f6ebde;          /* paper */
+      --muted:#6b5b4b;         /* cocoa */
+      --text:#2f2a24;          /* ink */
+      --accent:#575b52;        /* teal-blue */
+      --good:#2f9e6f;          /* green */
+      --warn:#c97a2b;          /* amber */
+      --bad:#c65b5b;           /* rose */
+      --border:rgba(47,42,36,.14);
+      --shadow: rgba(47,42,36,.10);
+      --wesgreen: 	#a7ba42;
+      --wesblue: 	#95ccba;
+      --wespink: #ffdede;
+      --wesbeige: #fff0cb;
+      --wesdarkbeige: #fff0cb;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:radial-gradient(1200px 700px at 20% -10%, #ffe7c7 0%, transparent 60%), radial-gradient(900px 600px at 110% 10%, #d7f0ef 0%, transparent 55%), linear-gradient(180deg,var(--bg), #f7eddc); color:var(--text)}
+    header{position:sticky;top:0;z-index:10; background: linear-gradient(190deg, rgba(167,186,66, 0.631), rgba(137, 153, 55, 0.566));backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{font-size:18px;margin:0;display:flex;align-items:center;gap:10px}
+    .pill{font-size:12px;color:var(--muted);border:1px solid var(--border);padding:4px 8px;border-radius:999px}
+    nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button, input, select{font:inherit}
+    .tabbtn{background:#ffe7c7d6 ;border:1px solid #e6c995;color:var(--text);padding:8px 10px;border-radius:10px;cursor:pointer}
+    .tabbtn.active{background: #936f40df; border-color:rgba(110, 51, 51, 0.65); box-shadow:0 0 0 3px rgba(124, 52, 59, 0.14); color: #ffe7c7}
+    .grid{display:grid;grid-template-columns:1.3fr .9fr;gap:14px;align-items:start}
+    @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg, rgba(245, 226, 205, 0.95), rgba(236, 210, 183, 0.95)); border:1px solid var(--border); border-radius:18px; padding:14px; box-shadow:0 10px 24px var(--shadow)}
+    .card h2{font-size:14px;margin:0 0 10px 0;color:#492e2e;font-weight:600}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center; margin: 10px}
+    .row > * {flex:1}
+    .row .tight{flex:0 0 auto}
+    .muted{color:var(--muted);font-size:12px}
+    .kpi{display:flex;gap:10px;flex-wrap:wrap}
+    .kpi .box{flex:1;min-width:160px;background:rgba(194, 146, 42, 0.278);border:1px solid var(--border);border-radius:14px;padding:12px}
+    .kpi .num{font-size:22px;font-weight:700}
+    .kpi .lbl{font-size:12px;color:var(--muted)}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{border:1px solid var(--border);border-radius:14px;padding:12px;background:var(--card)}
+    .itemTop{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+    .title{font-weight:650}
+    .sub{font-size:12px;color:var(--muted);margin-top:3px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{background:rgba(60,126,168,.12);border:1px solid rgba(60,126,168,.35);color:var(--text);padding:8px 10px;border-radius:12px;cursor:pointer}
+    .btn.secondary{background: #ff9c9cb4;border:1px solid var(--border);color:var(--text)}
+    .btn.danger{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.35)}
+    .btn.good{background:rgba(166, 186, 66, 0.8); border-color:rgba(105, 118, 43, 0.35);}
+    .btn:disabled{opacity:.45;cursor:not-allowed}
+    input, select{background:rgba(255,255,255,.65);border:1px solid var(--border);color:var(--text);padding:10px 10px;border-radius:12px;outline:none}
+    input:focus, select:focus{border-color:rgba(60,126,168,.65);box-shadow:0 0 0 3px rgba(60,126,168,.14)}
+    .sep{height:1px;background:var(--border);margin:12px 0}
+    .small{font-size:12px}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    td, th{font-size:12px;text-align:left;padding:10px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    th{color:#2a1c1c;font-weight:650; background: #a6ba429d;}
+    tr td:first-child, tr th:first-child{border-left:1px solid var(--border);border-top-left-radius:12px;border-bottom-left-radius:12px}
+    tr td:last-child, tr th:last-child{border-right:1px solid var(--border);border-top-right-radius:12px;border-bottom-right-radius:12px}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;border:1px solid var(--border);font-size:11px;color:var(--muted)}
+    .dot{width:8px;height:8px;border-radius:999px;background:var(--accent)}
+    .right{text-align:right}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .toast{position:fixed;top:150px;left:50%;transform:translateX(-50%);background:rgb(103, 123, 70);border:2px solid var(--border);padding:20px 20px;border-radius:30px;color:var(--text);font-size:12px;opacity:0;pointer-events:none;transition:opacity 2s ease; font-size:20px; color: var(--wesbeige); }
+    .toast.show{opacity:1}
+    .hint{font-size:12px;color:var(--muted);line-height:1.35}
+
+
+      /* Animated skill fill for Do-tab skill boxes */
+  .skillItem { position: relative; overflow: hidden; }
+  .skillFill{
+    position: absolute;
+    inset: 0 auto 0 0;           /* top right bottom left */
+    width: 0%;
+    background: rgba(60,126,168,.22);
+    transition: width 320ms ease;
+    pointer-events: none;
+  }
+  .skillItem .itemTop{ position: relative; z-index: 1; } /* keep text above fill */
+
+
+  
+
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>
+      🍓Habit Patch
+      <span class="pill" id="todayPill"></span>
+      <span class="pill mono" id="headerPot">💰 0</span>
+    </h1>
+    <nav>
+      <button class="tabbtn active" data-tab="do"> ⚡️ Do</button>
+      <button class="tabbtn" data-tab="tasks">🌱 Tasks</button>
+      <button class="tabbtn" data-tab="skills">🪴 Skills</button>
+      <button class="tabbtn" data-tab="rewards">🍄 Rewards</button>
+      <button class="tabbtn" data-tab="stats">🌙 Stats</button>
+      <button class="tabbtn" data-tab="settings"> ⚙️ Settings</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="tab-do" class="tab">
+    <div class="grid">
+      <section class="card">
+        <h2>Quick complete</h2>
+        <div class="row">
+          <input id="search" placeholder="Search tasks…" />
+          <select id="filterSkill" class="tight" style="min-width:170px">
+            <option value="">All skills</option>
+          </select>
+          <select id="sort" class="tight" style="min-width:170px">
+            <option value="recent">most recent</option>
+            <option value="effort">most effort</option>
+            <option value="money">most coins</option>
+            <option value="xp">highest xp</option>
+            <option value="name">name</option>
+          </select>
+        </div>
+        <div class="sep"></div>
+        <div class="list" id="doList"></div>
+        <div class="sep"></div>
+        <div class="hint">
+          Tip: keep tasks “farm-proof” with <span class="mono">Max / day</span> or <span class="mono">Cooldown</span> in the Tasks tab.
+        </div>
+      </section>
+
+      <aside class="card">
+        <h2>Pot + today</h2>
+        <div class="kpi">
+          <div class="box">
+            <div class="num" id="potMoney">0</div>
+            <div class="lbl">Pot Coins</div>
+          </div>
+          <div class="box">
+            <div class="num" id="todayEarned">0</div>
+            <div class="lbl">Earned today</div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <h2>Skill levels</h2>
+        <div id="skillBoxes" class="list"></div>
+        <div class="sep"></div>
+        <h2>Recent log</h2>
+        <div id="recentLog" class="list"></div>
+
+      </aside>
+    </div>
+  </div>
+
+  <div id="tab-tasks" class="tab" style="display:none">
+    <div class="grid">
+      <section class="card">
+        <h2>Tasks</h2>
+        <div class="row">
+          <input id="taskSearch" placeholder="Search tasks…" />
+          <select id="taskFilterSkill" class="tight" style="min-width:170px">
+            <option value="">All skills</option>
+          </select>
+          <select id="taskFilterActive" class="tight" style="min-width:170px">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+        <div class="sep"></div>
+        <div class="list" id="taskList"></div>
+      </section>
+      <aside class="card">
+        <h2>Add / edit task</h2>
+        <div class="row">
+          <input id="t_name" placeholder="Task name (e.g., Walk 30 min)" />
+        </div>
+        <div class="row">
+          <input id="t_skill" list="skillOptions" placeholder="Skill (e.g., Health)" />
+          <datalist id="skillOptions"></datalist>
+          <select id="t_streak" class="tight" style="min-width:170px">
+            <option value="daily">Streak: daily</option>
+            <option value="weekly">Streak: weekly</option>
+            <option value="monthly">Streak: monthly</option>
+            <option value="none">Streak: none</option>
+          </select>
+        </div>
+        <div class="row">
+          <input id="t_effort" type="number" min="1" max="10" step="1" placeholder="Effort 1–10" />
+          <input id="t_money" type="number" min="0" step="1" placeholder="Base money" />
+          <input id="t_xp" type="number" min="0" step="1" placeholder="Base XP" />
+        </div>
+        <div class="row">
+          <input id="t_cooldown" type="number" min="0" step="1" placeholder="Cooldown (hours)" />
+          <input id="t_maxPerDay" type="number" min="0" step="1" placeholder="Max / day (0 = no cap)" />
+        </div>
+        <div class="row">
+          <textarea id="t_notes" placeholder="Notes (only visible in edit mode)…"
+          style="width:100%;min-height:90px;resize:vertical;padding:10px;border-radius:12px;border:1px solid var(--border);background:var(--bg);"></textarea>
+          </div>
+        <div class="row">
+          <select id="t_active" class="tight" style="min-width:170px">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+          
+          <button class="btn good tight" id="saveTask">💾</button>
+          <button class="btn secondary tight" id="clearTask">🗑️</button>
+        </div>
+        <div class="sep"></div>
+        <div class="hint">
+          Defaults are set from effort if you leave <span class="mono">Base Coins</span> or <span class="mono">Base XP</span> empty.
+          Effort is always stored, so you can later change formulas without losing history.
+        </div>
+        <div class="sep"></div>
+        <div class="row">
+          <button class="btn good tight" id="seed">Load example tasks</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="tab-rewards" class="tab" style="display:none">
+    <div class="grid">
+      <section class="card">
+        <h2>Rewards shop</h2>
+        <div class="list" id="rewardList"></div>
+      </section>
+      <aside class="card">
+        <h2>Pot</h2>
+        <div class="kpi">
+          <div class="box">
+            <div class="num" id="potMoneyRewards">0</div>
+            <div class="lbl">Current pot</div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <h2>Add reward</h2>
+        <div class="row"><input id="r_name" placeholder="Reward (e.g., New running shoes)" /></div>
+        <div class="row">
+          <input id="r_cost" type="number" min="0" step="1" placeholder="Cost" />
+          <select id="r_goal" class="tight" style="min-width:170px">
+            <option value="true">Goal (save for it)</option>
+            <option value="false">One-off</option>
+          </select>
+        </div>
+        <div class="row">
+          <button class="btn good tight" id="saveReward">💾</button>
+          <button class="btn secondary tight" id="clearReward">🗑️</button>
+        </div>
+        <div class="sep"></div>
+        <h2>Purchase history</h2>
+        <div class="list" id="purchaseHistory"></div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="tab-skills" class="tab" style="display:none">
+    <div class="grid">
+      <section class="card">
+        <h2>Skills</h2>
+        <div class="hint">Each skill levels up based on XP. When you reach a new level, you get a <span class="mono">level-up reward</span> added to your pot automatically.</div>
+        <div class="sep"></div>
+        <div class="list" id="skillsList"></div>
+      </section>
+      <aside class="card">
+        <h2>Skill icons</h2>
+        <div class="hint">
+          You can draw your own small icons (PNG/SVG) and store them locally in this app.
+          <ul>
+            <li>Make a square icon (e.g., 128×128 or 256×256), transparent background recommended.</li>
+            <li>In the list on the left, click <b>Set icon</b> for a skill and choose the image file.</li>
+            <li>The icon is saved in your browser (localStorage). Export JSON if you want backups.</li>
+          </ul>
+          Quick workflow: draw in Figma / Procreate / even PowerPoint, export PNG, then import here.
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="tab-stats" class="tab" style="display:none">
+    <div class="card">
+      <div class="row">
+        <h2 class="tight" style="margin:0">Stats</h2>
+        <select id="statsMonth" class="tight" style="min-width:220px"></select>
+      </div>
+      <div class="sep"></div>
+      <div class="kpi">
+        <div class="box"><div class="num" id="m_money">0</div><div class="lbl">Coins earned</div></div>
+        <div class="box"><div class="num" id="m_tasks">0</div><div class="lbl">Completions</div></div>
+        <div class="box"><div class="num" id="m_best">–</div><div class="lbl">Top task</div></div>
+      </div>
+      <div class="sep"></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <section class="card" style="margin:0">
+          <h2>By skill</h2>
+          <div id="bySkill" class="list"></div>
+        </section>
+        <section class="card" style="margin:0">
+          <h2>By task</h2>
+          <div style="overflow:auto">
+            <table>
+              <thead><tr><th>Task</th><th>Skill</th><th class="right">Count</th><th class="right">Coins</th><th class="right">XP</th></tr></thead>
+              <tbody id="byTask"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-settings" class="tab" style="display:none">
+    <div class="grid">
+      <section class="card">
+        <h2>Economy rules</h2>
+        <div class="row">
+          <input id="s_moneyEffortBase" type="number" min="0" step="0.1" placeholder="Money base" />
+          <input id="s_moneyEffortPow" type="number" min="0.5" step="0.05" placeholder="Money curve (power)" />
+        </div>
+        <div class="row">
+          <input id="s_xpEffortBase" type="number" min="0" step="0.1" placeholder="XP base" />
+          <input id="s_xpEffortPow" type="number" min="0.5" step="0.05" placeholder="XP curve (power)" />
+        </div>
+        
+        <div class="sep"></div>
+        <h2>Streak multiplier (simple)</h2>
+        <div class="row">
+          <input id="s_streakStart" type="number" min="1" step="1" placeholder="Start bonus at streak day" />
+          <input id="s_streakStep" type="number" min="0" step="0.05" placeholder="Bonus step (e.g., 0.10 = +10%)" />
+          <input id="s_streakCap" type="number" min="1" step="0.05" placeholder="Multiplier cap (e.g., 1.50)" />
+        </div>
+        <div class="sep"></div>
+        <h2>Leveling</h2>
+        <div class="row">
+          <input id="s_xpLevelBase" type="number" min="1" step="1" placeholder="XP curve base (A)" />
+          <input id="s_xpLevelPow" type="number" min="1" step="0.1" placeholder="XP curve exponent (p)" />
+        </div>
+
+        <div class="row">
+          <input id="s_levelUpBaseReward" type="number" min="0" step="1" placeholder="Level-up base reward" />
+          <input id="s_levelUpGrowth" type="number" min="1" step="0.05" placeholder="Level-up growth" />
+        </div>
+        <div class="sep"></div>
+        <div class="row">
+          <button class="btn good tight" id="saveSettings">💾 Save Settings</button>
+          <button class="btn tight" id="exportData">📤 Export JSON</button>
+          <label class="btn danger tight" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
+            💌 Import JSON
+            <input id="importFile" type="file" accept="application/json" style="display:none" />
+          </label>
+        </div>
+        <div class="sep"></div>
+        <div class="hint">
+          Multiplier rule (per task): if streak mode is daily/weekly/monthly, and you keep it, you get a multiplier:
+          <span class="mono">mult = min(cap, 1 + step * max(0, streak - startDay + 1))</span>.
+          
+          You can change these settings later without breaking your history.
+        </div>
+      </section>
+      <aside class="card">
+        <h2>How it works</h2>
+        <div class="hint">
+          <div class="badge"><span class="dot"></span> Money pot</div>
+          <p>Completing tasks adds coins to your pot. Buying rewards subtracts from the pot.</p>
+          <div class="badge"><span class="dot" style="background:var(--good)"></span> Skills + XP</div>
+          <p>Each task has one skill. XP per skill builds levels using a curve (early levels are quick, later levels need more XP).</p>
+          <div class="badge"><span class="dot" style="background:var(--warn)"></span> Streaks</div>
+          <p>Daily means “on consecutive calendar days”. Weekly means “each calendar week” (Mon–Sun). Monthly means “each calendar month”.</p>
+          <div class="badge"><span class="dot" style="background:var(--bad)"></span> Anti-farming</div>
+          <p>Use cooldown hours and/or max per day. The app blocks extra completions if you exceed the limits.</p>
+        </div>
+        <div class="row">
+          <button class="btn danger tight" id="wipe">Reset everything</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  // ---------------------------
+  // Data model (localStorage)
+  // ---------------------------
+  const KEY = "habitpot_v01";
+
+  const defaultState = () => ({
+  tasks: [],
+  rewards: [],
+  purchases: [],
+  log: [],
+  skillMeta: {},        // { [skillName]: { iconDataUrl, lastRewardedLevel } }
+  skillLevelUps: [],    // history of level-up payouts
+  settings: {
+    settings: {
+              // Effort → rewards curves
+              moneyEffortBase: 3,
+              moneyEffortPow: 1.25,
+              xpEffortBase: 5,
+              xpEffortPow: 1.20,
+
+              // Streak multiplier
+              streakStartDay: 3,
+              streakStep: 0.10,
+              streakCap: 1.50,
+
+              // Skill leveling curve (XP thresholds)
+              xpLevelBase: 120,
+              xpLevelPow: 1.5,
+
+              // Level-up reward curve
+              levelUpBaseReward: 40,
+              levelUpGrowth: 1.25,
+            },
+  },
+  potMoney: 0
+});
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      if(!raw) return defaultState();
+      const parsed = JSON.parse(raw);
+      return Object.assign(defaultState(), parsed);
+    }catch(e){
+      console.warn(e);
+      return defaultState();
+    }
+  }
+
+  function saveState(){
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+
+  let state = loadState();
+
+  // ---------------------------
+  // Utilities
+  // ---------------------------
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+  const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+
+  function pad2(n){ return String(n).padStart(2,'0'); }
+
+  function toISODate(d){
+    const dt = (d instanceof Date) ? d : new Date(d);
+    return `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
+  }
+
+  function nowISO(){ return new Date().toISOString(); }
+
+  function startOfWeek(date){ // Monday
+    const d = new Date(date);
+    const day = (d.getDay() + 6) % 7; // Mon=0
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() - day);
+    return d;
+  }
+
+  function weekKey(date){
+    const s = startOfWeek(date);
+    return `${s.getFullYear()}-W${pad2(getWeekNumber(s))}`;
+  }
+
+  function getWeekNumber(d){
+    // ISO-ish: week number from Monday-based week starting date.
+    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = date.getUTCDay() || 7;
+    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+    return Math.ceil((((date - yearStart) / 86400000) + 1)/7);
+  }
+
+  function monthKey(date){
+    const d = new Date(date);
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}`;
+  }
+
+  function fmt(n){
+    if(Number.isNaN(n) || n === null || n === undefined) return "0";
+    return Math.round(n).toString();
+  }
+
+  function toast(msg){
+    const el = $('#toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'), 1600);
+  }
+
+  function clamp(x, a, b){ return Math.max(a, Math.min(b, x)); }
+
+  // ---------------------------
+  // Core logic
+  // ---------------------------
+
+function inferBaseMoney(effort){
+  const s = state.settings;
+  const e = Math.max(0, Number(effort) || 0);
+  const base = Number(s.moneyEffortBase ?? 3);
+  const pow  = Number(s.moneyEffortPow  ?? 1.25);
+  return Math.max(0, Math.round(base * Math.pow(e, pow)));
+}
+
+function inferBaseXP(effort){
+  const s = state.settings;
+  const e = Math.max(0, Number(effort) || 0);
+  const base = Number(s.xpEffortBase ?? 5);
+  const pow  = Number(s.xpEffortPow  ?? 1.20);
+  return Math.max(0, Math.round(base * Math.pow(e, pow)));
+}
+
+  function lastCompletion(taskId){
+    const items = state.log.filter(x => x.taskId === taskId).sort((a,b)=> b.ts.localeCompare(a.ts));
+    return items[0] || null;
+  }
+
+  function completionsOnDate(taskId, isoDate){
+    return state.log.filter(x => x.taskId === taskId && x.date === isoDate).length;
+  }
+
+  function hoursSince(tsISO){
+    const ms = Date.now() - new Date(tsISO).getTime();
+    return ms / 36e5;
+  }
+
+  function computeStreak(taskId){
+    const task = state.tasks.find(t => t.id === taskId);
+    if(!task || task.streakMode === 'none') return 0;
+
+    const logs = state.log
+      .filter(x => x.taskId === taskId)
+      .sort((a,b)=> a.date.localeCompare(b.date));
+
+    if(logs.length === 0) return 0;
+
+    // For streaks, count unique periods with at least one completion.
+    const mode = task.streakMode;
+    const periods = [];
+
+    for(const l of logs){
+      const d = new Date(l.date + "T00:00:00");
+      let key;
+      if(mode === 'daily') key = l.date;
+      else if(mode === 'weekly') key = weekKey(d);
+      else if(mode === 'monthly') key = monthKey(d);
+      else key = l.date;
+      if(periods.length === 0 || periods[periods.length-1] !== key) periods.push(key);
+    }
+
+    // Now count consecutive periods from the end.
+    let streak = 1;
+    for(let i = periods.length-2; i >= 0; i--){
+      const curr = periods[i];
+      const next = periods[i+1];
+      if(isConsecutivePeriod(curr, next, mode)) streak++;
+      else break;
+    }
+    return streak;
+  }
+
+  function isConsecutivePeriod(a, b, mode){
+    // a and b are period keys; check if b is the immediate next period after a.
+    if(mode === 'daily'){
+      const da = new Date(a + "T00:00:00");
+      const db = new Date(b + "T00:00:00");
+      da.setDate(da.getDate()+1);
+      return toISODate(da) === toISODate(db);
+    }
+    if(mode === 'monthly'){
+      const [ya, ma] = a.split('-').map(Number);
+      const [yb, mb] = b.split('-').map(Number);
+      const da = new Date(ya, ma-1, 1);
+      da.setMonth(da.getMonth()+1);
+      const nextKey = monthKey(da);
+      return nextKey === b;
+    }
+    if(mode === 'weekly'){
+      // Using startOfWeek based key; compare start dates.
+      // Recreate date from key is messy; instead compare Monday-start date from actual logs using a mapping.
+      // We'll approximate by parsing year and week number.
+      const [ya, wa] = a.split('-W');
+      const [yb, wb] = b.split('-W');
+      const A = weekStartDateISO(Number(ya), Number(wa));
+      const B = weekStartDateISO(Number(yb), Number(wb));
+      const dA = new Date(A + "T00:00:00");
+      dA.setDate(dA.getDate()+7);
+      return toISODate(dA) === toISODate(new Date(B + "T00:00:00"));
+    }
+    return false;
+  }
+
+  function weekStartDateISO(year, week){
+    // Get Monday of an ISO week.
+    const simple = new Date(Date.UTC(year,0,1 + (week - 1) * 7));
+    const dow = simple.getUTCDay();
+    const ISOweekStart = new Date(simple);
+    const diff = (dow <= 4 ? 1 - (dow||7) : 8 - dow);
+    ISOweekStart.setUTCDate(simple.getUTCDate() + diff);
+    return `${ISOweekStart.getUTCFullYear()}-${pad2(ISOweekStart.getUTCMonth()+1)}-${pad2(ISOweekStart.getUTCDate())}`;
+  }
+
+  function multiplierFromStreak(streak){
+    const s = state.settings;
+    if(streak <= 0) return 1;
+    const start = Number(s.streakStartDay)||1;
+    const step = Number(s.streakStep)||0;
+    const cap = Number(s.streakCap)||1;
+    const bonusSteps = Math.max(0, streak - start + 1);
+    const mult = 1 + step * bonusSteps;
+    return clamp(mult, 1, cap);
+  }
+
+  function canCompleteTask(task){
+    if(!task.active) return { ok:false, reason:"Task is inactive" };
+
+    const last = lastCompletion(task.id);
+    if(task.cooldownHours && Number(task.cooldownHours) > 0 && last){
+      const h = hoursSince(last.ts);
+      if(h < Number(task.cooldownHours)){
+        return { ok:false, reason:`Cooldown: wait ${Math.ceil(Number(task.cooldownHours)-h)}h` };
+      }
+    }
+
+    const today = toISODate(new Date());
+    if(task.maxPerDay && Number(task.maxPerDay) > 0){
+      const n = completionsOnDate(task.id, today);
+      if(n >= Number(task.maxPerDay)){
+        return { ok:false, reason:`Max per day reached (${task.maxPerDay})` };
+      }
+    }
+
+    return { ok:true };
+  }
+
+  function completeTask(taskId){
+    const task = state.tasks.find(t => t.id === taskId);
+    if(!task) return;
+
+    const gate = canCompleteTask(task);
+    if(!gate.ok){
+      toast(gate.reason);
+      return;
+    }
+
+    const streak = computeStreak(taskId);
+    const mult = (task.streakMode && task.streakMode !== 'none') ? multiplierFromStreak(streak + 1) : 1;
+
+    const baseMoney = (task.baseMoney === null || task.baseMoney === undefined || task.baseMoney === "")
+      ? inferBaseMoney(task.effort)
+      : Number(task.baseMoney);
+
+    const baseXP = (task.baseXP === null || task.baseXP === undefined || task.baseXP === "")
+      ? inferBaseXP(task.effort)
+      : Number(task.baseXP);
+
+    const earnedMoney = Math.round(baseMoney * mult);
+    const earnedXP = Math.round(baseXP * mult);
+
+    const entry = {
+      id: uid(),
+      ts: nowISO(),
+      date: toISODate(new Date()),
+      taskId: task.id,
+      taskName: task.name,
+      skill: task.skill,
+      effort: Number(task.effort)||0,
+      streakMode: task.streakMode,
+      streakAfter: streak + 1,
+      mult: mult,
+      money: earnedMoney,
+      xp: earnedXP
+    };
+
+    state.log.push(entry);
+    state.potMoney = Math.round((Number(state.potMoney)||0) + earnedMoney);
+
+    awardSkillLevelUps(task.skill);
+
+    saveState();
+    toast(`💰${earnedMoney} , 🔮${earnedXP}  (🔥${mult.toFixed(2)})`);
+    renderAll();
+  }
+
+  function refundLogEntry(entryId){
+    const idx = state.log.findIndex(x => x.id === entryId);
+    if(idx === -1) return;
+    const entry = state.log[idx];
+    // Reverse money effects only (XP stays in history? We'll reverse XP conceptually by removing entry)
+    state.potMoney = Math.round((Number(state.potMoney)||0) - Number(entry.money||0));
+    state.log.splice(idx,1);
+    saveState();
+    toast('Entry removed');
+    renderAll();
+  }
+
+  function skillXP(){
+    const map = new Map();
+    for(const l of state.log){
+      const key = l.skill || "(none)";
+      map.set(key, (map.get(key)||0) + (Number(l.xp)||0));
+    }
+    return map;
+  }
+
+  function xpThresholdForLevel(level){
+  // total XP required to *reach* this level (level 1 => 0)
+  const A = Number(state.settings.xpLevelBase ?? 120);
+  const p = Number(state.settings.xpLevelPow ?? 1.5);
+  const L = Math.max(1, Number(level) || 1);
+  if(L <= 1) return 0;
+  return Math.round(A * Math.pow(L - 1, p));
+}
+
+function levelFromXP(xp){
+  // find highest level such that threshold <= xp
+  const X = Math.max(0, Number(xp) || 0);
+
+  // small linear search is fine (levels won't be huge),
+  // but we cap to prevent infinite loops
+  let L = 1;
+  while(L < 500 && xpThresholdForLevel(L + 1) <= X) L++;
+  return L;
+}
+
+function levelProgressFromXP(xp){
+  const X = Math.max(0, Number(xp) || 0);
+  const L = levelFromXP(X);
+  const start = xpThresholdForLevel(L);
+  const end = xpThresholdForLevel(L + 1);
+  const span = Math.max(1, end - start);
+  const into = X - start;           // XP into this level
+  const need = end - X;             // XP to next level
+  const pct = clamp(into / span, 0, 1);
+  return { level: L, start, end, into, need, pct, span };
+}
+
+
+  
+
+
+
+  function levelUpRewardAmount(level){
+    const base = Number(state.settings.levelUpBaseReward)||40;
+    const g = Number(state.settings.levelUpGrowth)||1.25;
+    const L = Math.max(1, Number(level)||1);
+    if(L <= 1) return 0;
+    return Math.round(base * Math.pow(L-1, g));
+  }
+
+  function awardSkillLevelUps(skillName){
+  if(!skillName) return [];
+
+  const xpMap = skillXP();
+  const xp = xpMap.get(skillName) || 0;
+  const lvl = levelFromXP(xp);
+
+  state.skillMeta = state.skillMeta || {};
+  state.skillLevelUps = state.skillLevelUps || [];
+
+  const meta = state.skillMeta[skillName] || {};
+  const last = Number(meta.lastRewardedLevel || 1);
+
+  const events = [];
+
+  for(let L = last + 1; L <= lvl; L++){
+    const reward = levelUpRewardAmount(L);
+    if(reward > 0){
+      state.potMoney = Math.round((Number(state.potMoney)||0) + reward);
+
+      const ev = {
+        id: uid(),
+        ts: nowISO(),
+        date: toISODate(new Date()),
+        skill: skillName,
+        level: L,
+        reward
+      };
+
+      state.skillLevelUps.push(ev);
+      events.push(ev);
+    }
+    meta.lastRewardedLevel = L;
+  }
+
+  state.skillMeta[skillName] = meta;
+  return events;
+}
+
+
+  // ---------------------------
+  // Rendering
+  // ---------------------------
+  function renderTabs(){
+    $$('.tabbtn').forEach(b=>{
+      b.onclick = () => {
+        $$('.tabbtn').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        const tab = b.dataset.tab;
+        $$('.tab').forEach(t=>t.style.display='none');
+        $('#tab-'+tab).style.display = 'block';
+        renderAll();
+      };
+    });
+  }
+
+  function uniqueSkills(){
+    const set = new Set(state.tasks.map(t=>t.skill).filter(Boolean));
+    return Array.from(set).sort((a,b)=>a.localeCompare(b));
+  }
+
+  function renderSkillFilter(){
+  const skills = uniqueSkills();
+
+  // Do tab dropdown
+  const sel = $('#filterSkill');
+  if(sel){
+    const current = sel.value;
+    sel.innerHTML = '<option value="">All skills</option>' +
+      skills.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+    sel.value = current;
+  }
+
+  // Tasks tab dropdown
+  const sel2 = $('#taskFilterSkill');
+  if(sel2){
+    const current2 = sel2.value;
+    sel2.innerHTML = '<option value="">All skills</option>' +
+      skills.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+    sel2.value = current2;
+  }
+}
+
+function renderKPIs(){
+  $('#potMoney').textContent = fmt(state.potMoney);
+
+  const today = toISODate(new Date());
+  const todayMoney = state.log
+    .filter(x=>x.date===today)
+    .reduce((a,x)=>a+Number(x.money||0),0);
+  $('#todayEarned').textContent = fmt(todayMoney);
+
+  const pot2 = $('#potMoneyRewards');
+  if(pot2) pot2.textContent = fmt(state.potMoney);
+
+  // NEW: header pot
+  const hp = $('#headerPot');
+  if(hp) hp.textContent = `💰 ${fmt(state.potMoney)}`;
+}
+
+  function renderSkillBoxes(){
+  const xpMap = skillXP();
+  const skills = Array.from(xpMap.keys()).sort((a,b)=>a.localeCompare(b));
+
+  const host = $('#skillBoxes');
+  if(!host) return;
+
+  // Build a lookup of desired fill % per skill
+  const desired = new Map();
+  for(const s of skills){
+    const xp = xpMap.get(s) || 0;
+
+    const prog = levelProgressFromXP(xp);
+    desired.set(s, {
+      xp,
+      into: prog.into,
+      lvl: prog.level,
+      need: prog.need,
+      span: prog.span,                 // XP needed for this level
+      fill: Math.round(prog.pct * 100) // % through current level
+    });
+  }
+
+  // Remove boxes for skills that no longer exist
+  host.querySelectorAll('[data-skill]').forEach(el => {
+    const s = el.getAttribute('data-skill');
+    if(!desired.has(s)) el.remove();
+  });
+
+  // Empty state
+  if(skills.length === 0){
+    host.innerHTML = `<div class="item"><div class="muted">No XP yet. Complete a task to start leveling.</div></div>`;
+    return;
+  } else {
+    // If empty-state element exists from earlier, clear it safely
+    if(host.children.length === 1 && !host.firstElementChild?.hasAttribute('data-skill')){
+      host.innerHTML = '';
+    }
+  }
+
+  // Create/update each skill box WITHOUT resetting all
+  for(const s of skills){
+    const info = desired.get(s);
+    const id = `skillbox-${encodeURIComponent(s)}`;
+    let box = document.getElementById(id);
+
+    if(!box){
+      host.insertAdjacentHTML('beforeend', `
+        <div class="item skillItem" id="${id}" data-skill="${escapeHtml(s)}">
+          <div class="skillFill" style="width:${info.fill}%"></div>
+          <div class="itemTop">
+            <div>
+              <div class="title"></div>
+              <div class="sub"></div>
+            </div>
+            <div class="badge"></div>
+          </div>
+        </div>
+      `);
+      box = document.getElementById(id);
+    }
+
+    // Update text (note: use span instead of fixed per)
+    box.querySelector('.title').textContent = s;
+    box.querySelector('.sub').innerHTML = `Level <b>${info.lvl}</b> · ${fmt(info.into)} / ${fmt(info.span)} XP`;
+    box.querySelector('.badge').textContent = `${fmt(info.need)} XP to next`;
+
+    // Update fill ONLY if changed
+    const fillEl = box.querySelector('.skillFill');
+    const current = parseInt(fillEl.style.width || '0', 10);
+    const target = info.fill;
+
+    if(current !== target){
+      requestAnimationFrame(() => { fillEl.style.width = `${target}%`; });
+    }
+  }
+
+  // Keep DOM order sorted like `skills`
+  for(const s of skills){
+    const el = document.getElementById(`skillbox-${encodeURIComponent(s)}`);
+    if(el) host.appendChild(el);
+  }
+}
+
+  function renderRecentLog(){
+    const host = $('#recentLog');
+    const recent = [...state.log].sort((a,b)=>b.ts.localeCompare(a.ts)).slice(0,6);
+    host.innerHTML = '';
+    if(recent.length===0){
+      host.innerHTML = `<div class="item"><div class="muted">No entries yet.</div></div>`;
+      return;
+    }
+    for(const e of recent){
+      host.insertAdjacentHTML('beforeend', `
+        <div class="item">
+          <div class="itemTop">
+            <div>
+              <div class="title">${escapeHtml(e.taskName)}</div>
+              <div class="sub">🗓️ ${escapeHtml(e.date)} · ${escapeHtml(e.skill||'')} · 🔥 ${e.streakAfter||0} · x${Number(e.mult||1).toFixed(2)} </div>
+            </div>
+            <div class="actions">
+              <span class="badge">+${fmt(e.money)} 💰</span>
+              <span class="badge">+${fmt(e.xp)} 🔮</span>
+              <button class="btn secondary" onclick="refundLogEntry('${e.id}')">╳</button>
+            </div>
+          </div>
+        </div>
+      `);
+    }
+  }
+
+  function renderSkillDatalist(){
+  const dl = document.getElementById('skillOptions');
+  if(!dl) return;
+
+  const skills = uniqueSkills(); // already exists in your code
+  dl.innerHTML = skills.map(s => `<option value="${escapeHtml(s)}"></option>`).join('');
+}
+
+
+  function renderDoList(){
+    renderSkillFilter();
+
+    const q = ($('#search').value||'').toLowerCase().trim();
+    const skill = $('#filterSkill').value;
+    const sort = $('#sort').value;
+
+    let tasks = state.tasks.filter(t => t.active);
+    if(skill) tasks = tasks.filter(t => t.skill === skill);
+    if(q) tasks = tasks.filter(t => (t.name||'').toLowerCase().includes(q));
+
+    tasks = tasks.map(t => {
+      const streak = computeStreak(t.id);
+      const nextMult = (t.streakMode && t.streakMode !== 'none') ? multiplierFromStreak(streak + 1) : 1;
+      const baseMoney = (t.baseMoney === null || t.baseMoney === undefined || t.baseMoney === "") ? inferBaseMoney(t.effort) : Number(t.baseMoney);
+      const baseXP = (t.baseXP === null || t.baseXP === undefined || t.baseXP === "") ? inferBaseXP(t.effort) : Number(t.baseXP);
+      const gate = canCompleteTask(t);
+      return { t, streak, nextMult, baseMoney, baseXP, gate };
+    });
+
+    const sorter = {
+      recent:(a,b)=> (lastCompletion(b.t.id)?.ts||'').localeCompare(lastCompletion(a.t.id)?.ts||''),
+      effort:(a,b)=> (Number(b.t.effort)||0) - (Number(a.t.effort)||0),
+      money:(a,b)=> (b.baseMoney*b.nextMult) - (a.baseMoney*a.nextMult),
+      xp:(a,b)=> (b.baseXP*b.nextMult) - (a.baseXP*a.nextMult),
+      name:(a,b)=> (a.t.name||'').localeCompare(b.t.name||'')
+    };
+    tasks.sort(sorter[sort] || sorter.recent);
+
+    const host = $('#doList');
+    host.innerHTML = '';
+
+    if(tasks.length === 0){
+      host.innerHTML = `<div class="item"><div class="muted">No matching tasks. Add some in the Tasks tab.</div></div>`;
+      return;
+    }
+
+    for(const x of tasks){
+      const t = x.t;
+      const money = Math.round(x.baseMoney * x.nextMult);
+      const xp = Math.round(x.baseXP * x.nextMult);
+      const streakTxt = (t.streakMode && t.streakMode !== 'none') ? `${t.streakMode} streak: <b>${x.streak}</b> → <b>${x.streak+1}</b>` : `no streak`;
+      const caps = [];
+      if(t.cooldownHours && Number(t.cooldownHours)>0) caps.push(`cooldown ${t.cooldownHours}h`);
+      if(t.maxPerDay && Number(t.maxPerDay)>0) caps.push(`max/day ${t.maxPerDay}`);
+
+      host.insertAdjacentHTML('beforeend', `
+  <div class="item">
+    <div class="itemTop">
+      <div>
+        <div class="title">${escapeHtml(t.name)}</div>
+        <div class="sub">
+          <span class="badge">${escapeHtml(t.skill||'(no skill)')}</span>
+          <span class="badge">🐜 ${fmt(t.effort)}/10</span>
+          <span class="badge">🔥 ${streakTxt}</span>
+          ${caps.length ? `<span class="badge">✨ ${escapeHtml(caps.join(' · '))}</span>` : ''}
+        </div>
+      </div>
+      <div class="actions">
+        <span class="badge">+${fmt(money)} 💰</span>
+        <span class="badge">+${fmt(xp)} 🔮</span>
+        <button class="btn good" ${x.gate.ok ? '' : 'disabled'} onclick="completeTask('${t.id}')">✔︎</button>
+      </div>
+    </div>
+
+    ${
+      t.notes
+        ? `<div class="sub" style="margin-top:8px">
+             📝 ${escapeHtml(t.notes)}
+           </div>`
+        : ''
+    }
+
+    ${x.gate.ok ? '' : `
+      <div class="sub" style="margin-top:6px;color:var(--warn)">
+        ${escapeHtml(x.gate.reason)}
+      </div>
+    `}
+  </div>
+`);
+
+    }
+  }
+
+  function renderTaskList(){
+
+    renderSkillFilter(); 
+  const host = $('#taskList');
+  if(!host) return;
+  host.innerHTML = '';
+
+  const q = ($('#taskSearch')?.value || '').toLowerCase().trim();
+  const fSkill = $('#taskFilterSkill')?.value || '';
+  const fActive = $('#taskFilterActive')?.value || 'active';
+
+  let tasks = [...state.tasks];
+
+  if(fActive !== 'all'){
+    tasks = tasks.filter(t => (fActive === 'active') ? t.active : !t.active);
+  }
+  if(fSkill){
+    tasks = tasks.filter(t => t.skill === fSkill);
+  }
+  if(q){
+    tasks = tasks.filter(t => (t.name || '').toLowerCase().includes(q));
+  }
+
+  tasks.sort((a,b)=> (a.active===b.active ? (a.name||'').localeCompare(b.name||'') : (a.active? -1:1)));
+
+  if(tasks.length===0){
+    host.innerHTML = `<div class="item"><div class="muted">No matching tasks.</div></div>`;
+    return;
+  }
+
+  for(const t of tasks){
+    const streak = computeStreak(t.id);
+    const baseMoney = (t.baseMoney === null || t.baseMoney === undefined || t.baseMoney === "") ? inferBaseMoney(t.effort) : Number(t.baseMoney);
+    const baseXP = (t.baseXP === null || t.baseXP === undefined || t.baseXP === "") ? inferBaseXP(t.effort) : Number(t.baseXP);
+
+    host.insertAdjacentHTML('beforeend', `
+  <div class="item">
+    <div class="itemTop">
+      <div>
+        <div class="title">${escapeHtml(t.name)} ${t.active ? '' : '<span class="badge" style="margin-left:8px">inactive</span>'}</div>
+        <div class="sub">
+          <span class="badge">${escapeHtml(t.skill||'(no skill)')}</span>
+          <span class="badge">🐜 ${fmt(t.effort)}/10</span>
+          <span class="badge">💰 ${fmt(baseMoney)}</span>
+          <span class="badge">🔮 ${fmt(baseXP)}</span>
+          <span class="badge">🔥 ${escapeHtml(t.streakMode||'none')}: ${fmt(streak)}</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="editTask('${t.id}')">✏️</button>
+        <button class="btn danger" onclick="deleteTask('${t.id}')">🗑️</button>
+      </div>
+    </div>
+
+    ${
+      t.notes
+        ? `<div class="sub" style="margin-top:8px">
+             📝 ${escapeHtml(t.notes)}
+           </div>`
+        : ''
+    }
+  </div>
+`);
+
+  }
+}
+
+
+  function renderRewards(){
+    const host = $('#rewardList');
+    host.innerHTML = '';
+
+    const rewards = [...state.rewards].sort((a,b)=> (Number(a.cost)||0) - (Number(b.cost)||0));
+
+    if(rewards.length===0){
+      host.innerHTML = `<div class="item"><div class="muted">No rewards yet. Add one on the right.</div></div>`;
+      return;
+    }
+
+    for(const r of rewards){
+      const canBuy = (Number(state.potMoney)||0) >= (Number(r.cost)||0);
+      const pct = r.cost > 0 ? clamp((Number(state.potMoney)||0) / Number(r.cost), 0, 1) : 1;
+      host.insertAdjacentHTML('beforeend', `
+        <div class="item">
+          <div class="itemTop">
+            <div>
+              <div class="title">${escapeHtml(r.name)} ${r.goal?'<span class="badge" style="margin-left:8px">goal</span>':''}</div>
+              <div class="sub">Cost: <b>${fmt(r.cost)}</b> · Progress: <b>${Math.round(pct*100)}%</b></div>
+            </div>
+            <div class="actions">
+              <button class="btn good" ${canBuy?'' :'disabled'} onclick="buyReward('${r.id}')">💰</button>
+              <button class="btn" onclick="editReward('${r.id}')">✏️</button>
+              <button class="btn danger" onclick="deleteReward('${r.id}')">🗑️</button>
+            </div>
+          </div>
+        </div>
+      `);
+    }
+
+    const ph = $('#purchaseHistory');
+    const purchases = [...state.purchases].sort((a,b)=>b.ts.localeCompare(a.ts)).slice(0,12);
+    ph.innerHTML = '';
+    if(purchases.length===0){
+      ph.innerHTML = `<div class="item"><div class="muted">No purchases yet.</div></div>`;
+    } else {
+      for(const p of purchases){
+        ph.insertAdjacentHTML('beforeend', `
+          <div class="item">
+            <div class="itemTop">
+              <div>
+                <div class="title">${escapeHtml(p.name)}</div>
+                <div class="sub">${escapeHtml(p.date)} · -${fmt(p.cost)} money</div>
+              </div>
+              <div class="actions">
+                <button class="btn secondary" onclick="undoPurchase('${p.id}')">Undo</button>
+              </div>
+            </div>
+          </div>
+        `);
+      }
+    }
+  }
+
+  function renderStats(){
+    const sel = $('#statsMonth');
+    const months = Array.from(new Set(state.log.map(x=>monthKey(new Date(x.date+"T00:00:00"))))).sort((a,b)=>b.localeCompare(a));
+
+    const currentMonth = monthKey(new Date());
+    const options = [currentMonth, ...months.filter(m=>m!==currentMonth)];
+
+    sel.innerHTML = options.map(m=>`<option value="${m}">${m}</option>`).join('');
+
+    if(!sel.value) sel.value = currentMonth;
+
+    const m = sel.value;
+    const logs = state.log.filter(x=>monthKey(new Date(x.date+"T00:00:00"))===m);
+
+    const money = logs.reduce((a,x)=>a+Number(x.money||0),0);
+    const count = logs.length;
+
+    // top task
+    const taskAgg = new Map();
+    for(const l of logs){
+      const k = l.taskName;
+      if(!taskAgg.has(k)) taskAgg.set(k, {task:l.taskName, skill:l.skill, count:0, money:0, xp:0});
+      const o = taskAgg.get(k);
+      o.count += 1;
+      o.money += Number(l.money||0);
+      o.xp += Number(l.xp||0);
+    }
+    const taskRows = Array.from(taskAgg.values()).sort((a,b)=> b.money - a.money);
+
+    $('#m_money').textContent = fmt(money);
+    $('#m_tasks').textContent = fmt(count);
+    $('#m_best').textContent = taskRows[0] ? taskRows[0].task : '–';
+
+    // by skill
+    const skillAgg = new Map();
+    for(const l of logs){
+      const k = l.skill || '(none)';
+      if(!skillAgg.has(k)) skillAgg.set(k, {skill:k, money:0, xp:0, count:0});
+      const o = skillAgg.get(k);
+      o.money += Number(l.money||0);
+      o.xp += Number(l.xp||0);
+      o.count += 1;
+    }
+    const skillRows = Array.from(skillAgg.values()).sort((a,b)=> b.money - a.money);
+
+    const bySkill = $('#bySkill');
+    bySkill.innerHTML = '';
+    if(skillRows.length===0){
+      bySkill.innerHTML = `<div class="item"><div class="muted">No data for this month yet.</div></div>`;
+    } else {
+      for(const s of skillRows){
+        bySkill.insertAdjacentHTML('beforeend', `
+          <div class="item">
+            <div class="itemTop">
+              <div>
+                <div class="title">${escapeHtml(s.skill)}</div>
+                <div class="sub">${fmt(s.count)} completions · ${fmt(s.xp)} XP</div>
+              </div>
+              <div class="badge">${fmt(s.money)} money</div>
+            </div>
+          </div>
+        `);
+      }
+    }
+
+    // by task table
+    const tbody = $('#byTask');
+    tbody.innerHTML = '';
+    for(const r of taskRows){
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td>${escapeHtml(r.task)}</td>
+          <td>${escapeHtml(r.skill||'')}</td>
+          <td class="right">${fmt(r.count)}</td>
+          <td class="right">${fmt(r.money)}</td>
+          <td class="right">${fmt(r.xp)}</td>
+        </tr>
+      `);
+    }
+
+    sel.onchange = () => renderStats();
+  }
+
+  function renderSettings(){
+  const s = state.settings;
+
+  // Curved effort rewards
+  $('#s_moneyEffortBase').value = s.moneyEffortBase ?? 3;
+  $('#s_moneyEffortPow').value  = s.moneyEffortPow  ?? 1.25;
+  $('#s_xpEffortBase').value    = s.xpEffortBase    ?? 5;
+  $('#s_xpEffortPow').value     = s.xpEffortPow     ?? 1.20;
+
+  // Streak
+  $('#s_streakStart').value = s.streakStartDay;
+  $('#s_streakStep').value  = s.streakStep;
+  $('#s_streakCap').value   = s.streakCap;
+
+  // Level curve
+  $('#s_xpLevelBase').value = s.xpLevelBase ?? 120;
+  $('#s_xpLevelPow').value  = s.xpLevelPow  ?? 1.5;
+
+  // Level-up reward curve
+  $('#s_levelUpBaseReward').value = s.levelUpBaseReward ?? 40;
+  $('#s_levelUpGrowth').value     = s.levelUpGrowth     ?? 1.25;
+}
+
+
+
+  function renderTodayPill(){
+    const d = new Date();
+    $('#todayPill').textContent = d.toLocaleDateString(undefined, { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+  }
+
+
+  function renderSkillsTab(){
+  const host = $('#skillsList');
+  if(!host) return;
+
+  const xpMap = skillXP();
+  const skills = Array.from(new Set([
+    ...uniqueSkills(),
+    ...Array.from(xpMap.keys())
+  ])).sort((a,b)=>a.localeCompare(b));
+
+  host.innerHTML = '';
+
+  if(skills.length === 0){
+    host.innerHTML = `<div class="item"><div class="muted">No skills yet. Add a task with a skill.</div></div>`;
+    return;
+  }
+
+  state.skillMeta = state.skillMeta || {};
+
+  for(const s of skills){
+    const xp = xpMap.get(s) || 0;
+
+    // NEW: curve-based progress
+    const prog = levelProgressFromXP(xp);
+    const lvl = prog.level;
+    const into = prog.into;
+    const span = prog.span;
+    const pct = prog.pct;
+
+    const nextReward = levelUpRewardAmount(lvl+1);
+
+    const meta = state.skillMeta[s] || {};
+    const icon = meta.iconDataUrl;
+
+    host.insertAdjacentHTML('beforeend', `
+      <div class="item">
+        <div class="itemTop">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="width:44px;height:44px;border-radius:14px;border:1px solid var(--border);background:rgba(60,126,168,.08);display:flex;align-items:center;justify-content:center;overflow:hidden">
+              ${icon ? `<img src="${icon}" alt="${escapeHtml(s)}" style="width:100%;height:100%;object-fit:cover"/>`
+                     : `<span class="mono" style="font-size:14px">${escapeHtml((s||'?').slice(0,2).toUpperCase())}</span>`}
+            </div>
+            <div>
+              <div class="title">${escapeHtml(s)}</div>
+              <div class="sub">Level <b>${lvl}</b> · ${fmt(xp)} XP total · next level reward <b>+${fmt(nextReward)}</b></div>
+            </div>
+          </div>
+          <div class="actions">
+            <label class="btn" style="cursor:pointer">🎨
+              <input type="file" accept="image/*" style="display:none" onchange="setSkillIcon(event,'${escapeJs(s)}')" />
+            </label>
+            ${icon ? `<button class="btn danger tight" onclick="clearSkillIcon('${escapeJs(s)}')">Remove icon</button>` : ''}
+          </div>
+        </div>
+
+        <div style="margin-top:10px">
+          <div style="height:10px;border-radius:999px;border:1px solid var(--border);background:rgba(0,0,0,.06);overflow:hidden">
+            <div style="height:100%;width:${Math.round(pct*100)}%;background:rgba(60,126,168,.55)"></div>
+          </div>
+          <div class="sub" style="margin-top:6px">${fmt(into)} / ${fmt(span)} XP to next level</div>
+        </div>
+      </div>
+    `);
+  }
+}
+
+async function setSkillIcon(evt, skill){
+  const file = evt.target.files?.[0];
+  if(!file) return;
+  const dataUrl = await fileToDataURL(file);
+  state.skillMeta = state.skillMeta || {};
+  state.skillMeta[skill] = Object.assign(state.skillMeta[skill]||{}, { iconDataUrl: dataUrl });
+  saveState();
+  toast('Icon saved');
+  renderAll();
+}
+
+function clearSkillIcon(skill){
+  state.skillMeta = state.skillMeta || {};
+  if(state.skillMeta[skill]) delete state.skillMeta[skill].iconDataUrl;
+  saveState();
+  toast('Icon removed');
+  renderAll();
+}
+
+function fileToDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+function escapeJs(s){
+  return String(s ?? '').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+
+window.setSkillIcon = setSkillIcon;
+window.clearSkillIcon = clearSkillIcon;
+
+
+  function renderAll(){
+    renderTodayPill();
+    renderKPIs();
+    renderSkillBoxes();
+    renderSkillsTab();
+    renderRecentLog();
+    renderDoList();
+    renderSkillDatalist();
+    renderTaskList();
+    renderRewards();
+    renderStats();
+    renderSettings();
+    saveState();
+
+
+  }
+
+
+
+
+  // ---------------------------
+  // Task CRUD
+  // ---------------------------
+  let editingTaskId = null;
+
+  function readTaskForm(){
+  const name = $('#t_name').value.trim();
+  const skill = $('#t_skill').value.trim();
+  const streakMode = $('#t_streak').value;
+  const effort = clamp(Number($('#t_effort').value||0), 1, 10);
+  const notes = ($('#t_notes')?.value || '').trim(); 
+
+  let baseMoney = $('#t_money').value;
+  let baseXP = $('#t_xp').value;
+
+  baseMoney = baseMoney === '' ? '' : Number(baseMoney);
+  baseXP = baseXP === '' ? '' : Number(baseXP);
+
+  const cooldownHours = Number($('#t_cooldown').value||0);
+  const maxPerDay = Number($('#t_maxPerDay').value||0);
+  const active = $('#t_active').value === 'true';
+  
+
+  return { name, skill, streakMode, effort, notes, baseMoney, baseXP, cooldownHours, maxPerDay, active};
+}
+
+  function clearTaskForm(){
+    editingTaskId = null;
+    $('#t_name').value = '';
+    $('#t_skill').value = '';
+    $('#t_streak').value = 'daily';
+    $('#t_effort').value = '';
+    $('#t_money').value = '';
+    $('#t_xp').value = '';
+    $('#t_cooldown').value = '';
+    $('#t_maxPerDay').value = '';
+    $('#t_active').value = 'true';
+    $('#t_notes').value = '';
+  }
+
+  function editTask(id){
+    const t = state.tasks.find(x=>x.id===id);
+    if(!t) return;
+    editingTaskId = id;
+    $('#t_name').value = t.name || '';
+    $('#t_skill').value = t.skill || '';
+    $('#t_streak').value = t.streakMode || 'daily';
+    $('#t_effort').value = t.effort ?? '';
+    $('#t_money').value = (t.baseMoney === '' || t.baseMoney === null || t.baseMoney === undefined) ? '' : t.baseMoney;
+    $('#t_xp').value = (t.baseXP === '' || t.baseXP === null || t.baseXP === undefined) ? '' : t.baseXP;
+    $('#t_cooldown').value = t.cooldownHours ?? '';
+    $('#t_maxPerDay').value = t.maxPerDay ?? '';
+    $('#t_active').value = t.active ? 'true' : 'false';
+    $('#t_notes').value = t.notes || ' ';
+    toast('Editing task');
+
+  }
+
+  function deleteTask(id){
+    const t = state.tasks.find(x=>x.id===id);
+    if(!t) return;
+    const ok = confirm(`Delete task “${t.name}”? This does NOT delete past log entries.`);
+    if(!ok) return;
+    state.tasks = state.tasks.filter(x=>x.id!==id);
+    if(editingTaskId===id) clearTaskForm();
+    saveState();
+    renderAll();
+  }
+
+  // Expose for inline onclick
+  window.editTask = editTask;
+  window.deleteTask = deleteTask;
+  window.completeTask = completeTask;
+  window.refundLogEntry = refundLogEntry;
+
+  // ---------------------------
+  // Reward CRUD
+  // ---------------------------
+  let editingRewardId = null;
+
+  function clearRewardForm(){
+    editingRewardId = null;
+    $('#r_name').value = '';
+    $('#r_cost').value = '';
+    $('#r_goal').value = 'true';
+  }
+
+  function editReward(id){
+    const r = state.rewards.find(x=>x.id===id);
+    if(!r) return;
+    editingRewardId = id;
+    $('#r_name').value = r.name || '';
+    $('#r_cost').value = r.cost ?? '';
+    $('#r_goal').value = r.goal ? 'true' : 'false';
+    toast('Editing reward');
+  }
+
+  function deleteReward(id){
+    const r = state.rewards.find(x=>x.id===id);
+    if(!r) return;
+    const ok = confirm(`Delete reward “${r.name}”?`);
+    if(!ok) return;
+    state.rewards = state.rewards.filter(x=>x.id!==id);
+    if(editingRewardId===id) clearRewardForm();
+    saveState();
+    renderAll();
+  }
+
+  function buyReward(id){
+    const r = state.rewards.find(x=>x.id===id);
+    if(!r) return;
+    const cost = Number(r.cost||0);
+    if((Number(state.potMoney)||0) < cost){
+      toast('Not enough money');
+      return;
+    }
+    state.potMoney = Math.round((Number(state.potMoney)||0) - cost);
+    state.purchases.push({ id: uid(), ts: nowISO(), date: toISODate(new Date()), rewardId: r.id, name: r.name, cost });
+    saveState();
+    toast('Purchased!');
+    renderAll();
+  }
+
+  function undoPurchase(id){
+    const idx = state.purchases.findIndex(x=>x.id===id);
+    if(idx===-1) return;
+    const p = state.purchases[idx];
+    state.potMoney = Math.round((Number(state.potMoney)||0) + Number(p.cost||0));
+    state.purchases.splice(idx,1);
+    saveState();
+    toast('Purchase undone');
+    renderAll();
+  }
+
+  window.editReward = editReward;
+  window.deleteReward = deleteReward;
+  window.buyReward = buyReward;
+  window.undoPurchase = undoPurchase;
+
+  // ---------------------------
+  // Settings + import/export
+  // ---------------------------
+
+  function saveSettingsFromForm(){
+  // Curved effort rewards
+  state.settings.moneyEffortBase = Number($('#s_moneyEffortBase').value || 3);
+  state.settings.moneyEffortPow  = Number($('#s_moneyEffortPow').value  || 1.25);
+  state.settings.xpEffortBase    = Number($('#s_xpEffortBase').value    || 5);
+  state.settings.xpEffortPow     = Number($('#s_xpEffortPow').value     || 1.20);
+
+  // Streak
+  state.settings.streakStartDay = Number($('#s_streakStart').value||1);
+  state.settings.streakStep     = Number($('#s_streakStep').value||0);
+  state.settings.streakCap      = Number($('#s_streakCap').value||1);
+
+  // Level curve
+  state.settings.xpLevelBase = Number($('#s_xpLevelBase').value || 120);
+  state.settings.xpLevelPow  = Number($('#s_xpLevelPow').value  || 1.5);
+
+  // Level-up reward curve
+  state.settings.levelUpBaseReward = Number($('#s_levelUpBaseReward').value || 40);
+  state.settings.levelUpGrowth     = Number($('#s_levelUpGrowth').value     || 1.25);
+
+  saveState();
+  toast('Settings saved');
+  renderAll();
+}
+
+
+  
+
+  function exportJSON(){
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `habitPatch_export_${toISODate(new Date())}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function importJSON(file){
+    const txt = await file.text();
+    const parsed = JSON.parse(txt);
+    // shallow validation
+    if(!parsed || typeof parsed !== 'object' || !('tasks' in parsed) || !('log' in parsed)){
+      toast('Invalid file');
+      return;
+    }
+    state = Object.assign(defaultState(), parsed);
+    saveState();
+    toast('Imported');
+    renderAll();
+  }
+
+  // ---------------------------
+  // Seed + reset
+  // ---------------------------
+  function seedExample(){
+    if(state.tasks.length>0){
+      const ok = confirm('Add example tasks (won\'t delete existing ones)?');
+      if(!ok) return;
+    }
+    const examples = [
+      { name:'Walk 30 min', skill:'Health', effort:6, baseMoney:'', baseXP:'', streakMode:'daily', cooldownHours:0, maxPerDay:1, active:true },
+      { name:'Run session', skill:'Health', effort:8, baseMoney:'', baseXP:'', streakMode:'weekly', cooldownHours:12, maxPerDay:0, active:true },
+      { name:'Meditate 10 min', skill:'Mind', effort:4, baseMoney:'', baseXP:'', streakMode:'daily', cooldownHours:0, maxPerDay:1, active:true },
+      { name:'Stretch / mobility', skill:'Health', effort:3, baseMoney:'', baseXP:'', streakMode:'daily', cooldownHours:0, maxPerDay:1, active:true },
+      { name:'Clean kitchen', skill:'Home', effort:5, baseMoney:'', baseXP:'', streakMode:'weekly', cooldownHours:0, maxPerDay:1, active:true },
+      { name:'Deep clean (bathroom)', skill:'Home', effort:7, baseMoney:'', baseXP:'', streakMode:'monthly', cooldownHours:0, maxPerDay:1, active:true },
+      { name:'Practice instrument', skill:'Music', effort:6, baseMoney:'', baseXP:'', streakMode:'daily', cooldownHours:0, maxPerDay:1, active:true },
+      { name:'Read 20 pages', skill:'Mind', effort:5, baseMoney:'', baseXP:'', streakMode:'daily', cooldownHours:0, maxPerDay:1, active:true }
+    ];
+    for(const e of examples){
+      state.tasks.push({ id: uid(), ...e });
+    }
+    state.rewards.push({ id: uid(), name:'New running shoes', cost: 900, goal:true });
+    state.rewards.push({ id: uid(), name:'Movie night', cost: 120, goal:false });
+    saveState();
+    toast('Examples loaded');
+    renderAll();
+  }
+
+  function wipeAll(){
+    const ok = confirm('This will delete tasks, rewards, log, and money. Continue?');
+    if(!ok) return;
+    state = defaultState();
+    saveState();
+    clearTaskForm();
+    clearRewardForm();
+    toast('Reset');
+    renderAll();
+  }
+
+  // ---------------------------
+  // Safety: tiny HTML escape
+  // ---------------------------
+  function escapeHtml(s){
+    return String(s ?? '').replace(/[&<>"']/g, (c)=>({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+    }[c]));
+  }
+
+  // ---------------------------
+  // Wire up events
+  // ---------------------------
+  function wire(){
+    $('#search').addEventListener('input', renderDoList);
+    $('#filterSkill').addEventListener('change', renderDoList);
+    $('#sort').addEventListener('change', renderDoList);
+    $('#taskSearch')?.addEventListener('input', renderTaskList);
+    $('#taskFilterSkill')?.addEventListener('change', renderTaskList);
+    $('#taskFilterActive')?.addEventListener('change', renderTaskList);
+
+
+    $('#saveTask').onclick = () => {
+      const t = readTaskForm();
+      if(!t.name){ toast('Task name required'); return; }
+      if(!t.skill){ toast('Skill required'); return; }
+      if(!t.effort || t.effort<1 || t.effort>10){ toast('Effort must be 1–10'); return; }
+
+      const payload = {
+        name: t.name,
+        skill: t.skill,
+        effort: t.effort,
+        streakMode: t.streakMode,
+        baseMoney: t.baseMoney,
+        baseXP: t.baseXP,
+        cooldownHours: t.cooldownHours,
+        maxPerDay: t.maxPerDay,
+        active: t.active,
+        notes: t.notes  
+      };
+
+      if(editingTaskId){
+        const idx = state.tasks.findIndex(x=>x.id===editingTaskId);
+        if(idx!==-1) state.tasks[idx] = Object.assign(state.tasks[idx], payload);
+        toast('Task updated');
+      } else {
+        state.tasks.push({ id: uid(), ...payload });
+        toast('Task added');
+      }
+      saveState();
+      clearTaskForm();
+      renderAll();
+    };
+
+    $('#clearTask').onclick = () => { clearTaskForm(); toast('Cleared'); };
+
+    $('#saveReward').onclick = () => {
+      const name = $('#r_name').value.trim();
+      const cost = Number($('#r_cost').value||0);
+      const goal = $('#r_goal').value === 'true';
+      if(!name){ toast('Reward name required'); return; }
+      if(cost < 0){ toast('Cost must be >= 0'); return; }
+
+      const payload = { name, cost, goal };
+      if(editingRewardId){
+        const idx = state.rewards.findIndex(x=>x.id===editingRewardId);
+        if(idx!==-1) state.rewards[idx] = Object.assign(state.rewards[idx], payload);
+        toast('Reward updated');
+      } else {
+        state.rewards.push({ id: uid(), ...payload });
+        toast('Reward added');
+      }
+      saveState();
+      clearRewardForm();
+      renderAll();
+    };
+
+    $('#clearReward').onclick = () => { clearRewardForm(); toast('Cleared'); };
+
+    $('#saveSettings').onclick = saveSettingsFromForm;
+    $('#exportData').onclick = exportJSON;
+    $('#importFile').addEventListener('change', async (e)=>{
+      const f = e.target.files?.[0];
+      if(!f) return;
+      try{ await importJSON(f); }
+      catch(err){ console.warn(err); toast('Import failed'); }
+      e.target.value = '';
+    });
+
+    $('#seed').onclick = seedExample;
+    $('#wipe').onclick = wipeAll;
+  }
+
+  // ---------------------------
+  // Init
+  // ---------------------------
+  renderTabs();
+  wire();
+  renderAll();
+</script>
+</body>
+</html>
